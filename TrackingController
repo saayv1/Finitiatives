@@ -1,0 +1,64 @@
+<?php namespace App\Http\Controllers;
+
+use App\Issue;
+use App\Status_table;
+use App\Developers;
+use App\Category;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Redirect;
+use Auth;
+use Hash;
+use Mail;
+
+
+
+class TrackingController extends Controller
+{
+
+    public function EnterTrackingId(){
+
+        return view ('EnterTrackingId');
+    }
+
+    public function UserTracking(){
+
+        $issue_id=Input::get('issue_id');
+        $issue_details=Issue::where('issue_id',$issue_id)->first();
+        $reopen=Input::get('reopen');
+
+        if($issue_id) {
+            if($reopen){
+                if($issue_details->status=='4') {
+                    $issue_details->status = '1';
+                    $issue_details->dev_id = '1';
+                    $issue_details->start = NULL;
+                    $issue_details->close = NULL;
+                    $issue_details->dev_comments = NULL;
+                    $issue_details->save();
+                    return Redirect::back()->withMessage('Your issue has been reopened');
+                }
+                else {
+                    return Redirect::back()->withErrors('The status of your issue must be complete for it to be reopened');
+                    }
+            }
+            if($issue_details) {
+                return view('UserTracking');
+            }
+            else return Redirect::back()->withErrors('This issue id is unavailable');
+        }
+        else return Redirect::back()->withErrors('Issue id was not entered');
+    }
+
+
+
+
+
+
+
+
+
+
+
+}
