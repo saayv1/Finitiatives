@@ -1,0 +1,21 @@
+<?php
+
+
+use App\Issue;
+use App\Developers;
+
+?>
+
+Dear <span style="color:red"><?php echo $assigned_dev->dev_name; ?></span> ,
+<br>
+
+An issue has been assigned to you having id <span style="color: #009999"> <?php echo $temp->issue_id; ?></span>.<br>
+The category is <span style="color: #000099"> <?php echo $temp->Category->category_name ?> </span>.<br>
+The header is <span style="color: #ce4844">'<?php echo $temp->issue_header ?>'</span>.<br>
+It's description is <br>
+<span style="color: #463265">
+<?php echo $temp->issue_description ?>
+</span>
+
+
+
