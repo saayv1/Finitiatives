@@ -1,0 +1,1249 @@
+<?php use App\Issue;
+        use App\Developers;
+        use App\Status_table;
+?>
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="{{ asset('flip-logo.png') }}">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Alfa+Slab+One">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+
+    @if ($errors->has())
+        <div class="alert alert-danger">
+            @foreach ($errors->all() as $error)
+                {{ $error }}<br>
+            @endforeach
+        </div>
+    @endif
+
+
+    <title>
+        List of issues assigned to the developer
+    </title>
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <div class="row h1">
+                <div class="col-md-4">
+                    <img src="http://www.learnwithflip.com/assets//front/images/logo.png" border="0" alt="Finitiatives Learning India Pvt.Ltd" title="Finitiatives Learning India Pvt.Ltd">
+                </div>
+                <div class="col-md-4 h1 text-center" style="font-family: Alfa Slab One">
+                    Welcome <?php echo Auth::user()->dev_name ?>
+                </div>
+                <div class="col-md-4 text-right">
+                    <form class="form-inline" method="get" action="logout">
+                        <button type="submit" class="btn btn-info btn-lg" name="logout" value="logout"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <?php $key=$_GET['key'];?>
+    <br>
+</head>
+<body>
+
+<div class="container">
+
+
+    <?php if($key==0){  ?>
+        <?php  $var = Issue::where('dev_id',Auth::user()->id)->orderBy('issue_id','desc')->paginate('7'); ?>
+        <?php  $var11 = Issue::where('dev_id',Auth::user()->id)->first(); ?>
+        <div class="row">
+            <div class="alert alert-info"><h3>These are the issues that are assigned to you</h3></div>
+        </div>
+        <div class="row">
+        <div class="col-md-4">
+        Choose by category
+        <select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+            <option >select</option>
+            <option value="dv?key=0">All</option>
+            <option value="dv?key=1">Internal</option>
+            <option value="dv?key=2">External</option>
+        </select>
+            </div>
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                Choose by status
+        <select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+            <option >select</option>
+            <option value="dv?key=22">Assigned</option>
+            <option value="dv?key=23">In Progress</option>
+            <option value="dv?key=24">Completed</option>
+        </select>
+                </div>
+            </div>
+        <?php if(!$var11){ ?>
+        <div class="alert alert-danger"><h3>There are no issues</h3></div>
+        <?php }else{ ?>
+
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th>Issue ID</th>
+                <th>Name</th>
+                <th>Email Id</th>
+                <th>Category</th>
+                <th>Issue Header</th>
+                <th>Attachment</th>
+                <th>Status</th>
+                <th>Dev Name</th>
+                <th>Designation</th>
+                <th>Created Date</th>
+                <th>Start Date</th>
+                <th>Close Date</th>
+                <th>Edit</th>
+            <tr/>
+            <?php foreach ($var as $key => $value) { ?>
+            <tr>
+                <td><?php echo $value->issue_id;?></td>
+                <td><?php echo $value->name;?></td>
+                <td><?php echo $value->email;?></td>
+                <td><?php echo $value->Category->category_name;?></td>
+                <td><?php echo $value->issue_header;?></td>
+                <td><?php echo $value->attachment;?></td>
+                <td><?php echo $value->Status_table->status_name;?></td>
+                <td><?php echo $value->Developers->dev_name;?></td>
+                <td><?php echo $value->Developers->designation;?></td>
+                <td><?php echo $value->created_at;?></td>
+                <td><?php echo $value->start;?></td>
+                <td><?php echo $value->close;?></td>
+                <?php if(Auth::user()->designation == 'SUPER_ADMIN') { ?>
+                <td><a href="assign?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+                <?php } else { ?>
+                <td><a href="assignd?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+                <?php } ?>
+            </tr>
+            <?php } ?>
+        </table>
+        <?php echo $var->appends(['key'=>'0'])->render(); ?>
+
+    <?php } ?>
+
+        <?php if(Auth::user()->designation == 'SUPER_ADMIN'){ ?>
+        <h2>
+            To check out the other issues, click   <a href="dv?key=4"><button class="btn btn-info btn-lg">Here</button></a>
+        </h2>
+        <?php } ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <?php } elseif($key==1){ ?>
+        <div class="row">
+            <div class="alert alert-info"><h3>These are the issues that are assigned to you belonging to the internal category</h3></div>
+            <?php $var11= Issue::where('dev_id',Auth::user()->id)->where('category','1')->first(); ?>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+        Choose by category
+        <select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+            <option >select</option>
+            <option value="dv?key=0">All</option>
+            <option value="dv?key=1">Internal</option>
+            <option value="dv?key=2">External</option>
+        </select>
+                </div>
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+
+        Choose by status
+        <select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+            <option >select</option>
+            <option value="dv?key=22">Assigned</option>
+            <option value="dv?key=23">In Progress</option>
+            <option value="dv?key=24">Completed</option>
+        </select>
+                    </div>
+                    </div>
+
+        <?php if(!$var11) { ?>
+        <div class="alert alert-danger"><h3>There are no issues</h3></div>
+        <?php        }else{ ?>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th>Issue ID</th>
+                <th>Name</th>
+                <th>Email Id</th>
+                <th>Category</th>
+                <th>Issue Header</th>
+                <th>Attachment</th>
+                <th>Status</th>
+                <th>Dev Name</th>
+                <th>Designation</th>
+                <th>Created Date</th>
+                <th>Start Date</th>
+                <th>Close Date</th>
+                <th>Edit</th>
+            <tr/>
+            <?php $var= Issue::where('dev_id',Auth::user()->id)->where('category','1')->orderBy('issue_id','desc')->paginate('7'); ?>
+            <?php foreach ($var as $key => $value) { ?>
+            <tr>
+                <td><?php echo $value->issue_id;?></td>
+                <td><?php echo $value->name;?></td>
+                <td><?php echo $value->email;?></td>
+                <td><?php echo $value->Category->category_name;?></td>
+                <td><?php echo $value->issue_header;?></td>
+                <td><?php echo $value->attachment;?></td>
+                <td><?php echo $value->Status_table->status_name;?></td>
+                <td><?php echo $value->Developers->dev_name;?></td>
+                <td><?php echo $value->Developers->designation;?></td>
+                <td><?php echo $value->created_at;?></td>
+                <td><?php echo $value->start;?></td>
+                <td><?php echo $value->close;?></td>
+                <?php if(Auth::user()->designation == 'SUPER_ADMIN') { ?>
+                <td><a href="assign?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+                <?php } else { ?>
+                <td><a href="assignd?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+                <?php } ?>
+            </tr>
+            <?php } ?>
+        </table>
+        <?php echo $var->appends(['key'=>'1'])->render(); ?>
+
+        <?php } ?>
+
+
+    <?php if(Auth::user()->designation == 'SUPER_ADMIN'){ ?>
+        <h2>
+            To check out the other issues, click  <a href="dv?key=4"><button class="btn btn-info btn-lg"> Here</button></a>
+        </h2>
+        <?php } ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <?php } elseif($key==2){ ?>
+        <div class="row">
+            <div class="alert alert-info"><h3>These are the issues that are assigned to you belongong to the external category</h3></div>
+            <?php $var11= Issue::where('dev_id',Auth::user()->id)->where('category','2')->first(); ?>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+        Choose by category
+        <select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+            <option >select</option>
+            <option value="dv?key=0">All</option>
+            <option value="dv?key=1">Internal</option>
+            <option value="dv?key=2">External</option>
+        </select>
+                </div>
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                Choose by status
+                <select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+            <option >select</option>
+            <option value="dv?key=22">Assigned</option>
+            <option value="dv?key=23">In Progress</option>
+            <option value="dv?key=24">Completed</option>
+        </select>
+            </div>
+        </div>
+
+        <?php if(!$var11){ ?>
+        <div class="alert alert-danger"><h3>There are no issues</h3></div>
+        <?php }else{ ?>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th>Issue ID</th>
+                <th>Name</th>
+                <th>Email Id</th>
+                <th>Category</th>
+                <th>Issue Header</th>
+                <th>Attachment</th>
+                <th>Status</th>
+                <th>Dev Name</th>
+                <th>Designation</th>
+                <th>Created Date</th>
+                <th>Start Date</th>
+                <th>Close Date</th>
+                <th>Edit</th>
+            <tr/>
+            <?php $var= Issue::where('dev_id',Auth::user()->id)->where('category','2')->orderBy('issue_id','desc')->paginate('7'); ?>
+            <?php foreach ($var as $key => $value) { ?>
+            <tr>
+                <td><?php echo $value->issue_id;?></td>
+                <td><?php echo $value->name;?></td>
+                <td><?php echo $value->email;?></td>
+                <td><?php echo $value->Category->category_name;?></td>
+                <td><?php echo $value->issue_header;?></td>
+                <td><?php echo $value->attachment;?></td>
+                <td><?php echo $value->Status_table->status_name;?></td>
+                <td><?php echo $value->Developers->dev_name;?></td>
+                <td><?php echo $value->Developers->designation;?></td>
+                <td><?php echo $value->created_at;?></td>
+                <td><?php echo $value->start;?></td>
+                <td><?php echo $value->close;?></td>
+                <?php if(Auth::user()->designation == 'SUPER_ADMIN') { ?>
+                <td><a href="assign?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+                <?php } else { ?>
+                <td><a href="assignd?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+                <?php } ?>
+            </tr>
+            <?php } ?>
+            <?php echo $var->appends(['key'=>'2'])->render(); ?>
+
+        <?php } ?>
+        </table>
+
+    <?php if(Auth::user()->designation == 'SUPER_ADMIN'){ ?>
+        <h2>
+            To check out the other issues, click  <a href="dv?key=4"><button class="btn btn-info btn-lg"> Here</button></a>
+        </h2>
+        <?php } ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <?php } else if($key==4){
+        if(Auth::user()->designation=='SUPER_ADMIN'){?>
+        <div class="row">
+            <div class="alert alert-success"><h3>ALL THE ISSUES</h3></div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+        Choose Category
+        <select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+            <option >select</option>
+            <option value="dv?key=4">All</option>
+            <option value="dv?key=5">Internal</option>
+            <option value="dv?key=6">External</option>
+        </select>
+                </div>
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+        Choose Status
+        <select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+            <option >select</option>
+            <option value="dv?key=10&status_name=1&category=0">Open</option>
+            <option value="dv?key=10&status_name=2&category=0">Assigned</option>
+            <option value="dv?key=10&status_name=3&category=0">In Progress</option>
+            <option value="dv?key=10&status_name=4&category=0">Completed</option>
+        </select>
+        </div>
+        </div>
+        <form action="dv" method="get">
+            <br>
+            To search by email, enter here<input type="text" class="form-control" name="mail_id"><input type="submit" class="btn btn-info" name="mail_id1">
+        </form>
+        <br>
+        <form action="dv" method="get">
+            To go to the issues directed towards you
+            <input type="submit" class="btn btn-info" name="back" value="click here">
+        </form>
+        <h1>All the Issues</h1>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th>Issue ID</th>
+                <th>Name</th>
+                <th>Email Id</th>
+                <th>Category</th>
+                <th>Issue Header</th>
+                <th>Attachment</th>
+                <th>Status</th>
+                <th>Dev Name</th>
+                <th>Designation</th>
+                <th>Created Date</th>
+                <th>Start Date</th>
+                <th>Close Date</th>
+                <th>Edit</th>
+            <tr/>
+            <?php $var=Issue::orderBy('issue_id','desc')->paginate('7'); ?>
+
+            <?php foreach ($var as $key => $value) { ?>
+            <tr>
+                <td><?php echo $value->issue_id;?></td>
+                <td><?php echo $value->name;?></td>
+                <td><?php echo $value->email;?></td>
+                <td><?php echo $value->Category->category_name;?></td>
+                <td><?php echo $value->issue_header;?></td>
+                <td><?php echo $value->attachment;?></td>
+                <td><?php echo $value->Status_table->status_name;?></td>
+                <td><?php echo $value->Developers->dev_name;?></td>
+                <td><?php echo $value->Developers->designation;?></td>
+                <td><?php echo $value->created_at;?></td>
+                <td><?php echo $value->start;?></td>
+                <td><?php echo $value->close;?></td>
+                <?php if(Auth::user()->designation == 'SUPER_ADMIN') { ?>
+                <td><a href="assign?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+                <?php } else { ?>
+                <td><a href="assignd?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+                <?php } ?>
+            </tr>
+            <?php } ?>
+        </table>
+        <?php echo $var->appends(['key'=>'4'])->render(); ?>
+        <?php  } else { echo "NOT ALLOWED" ?>
+        <?php return; } ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <?php } else if($key==5){
+        if(Auth::user()->designation=='SUPER_ADMIN'){?>
+        <div class="row">
+            <div class="alert alert-success"><h3>INTERNAL ISSUES</h3></div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+        Choose Category
+        <select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+            <option >select</option>
+            <option value="dv?key=4">All</option>
+            <option value="dv?key=5">Internal</option>
+            <option value="dv?key=6">External</option>
+        </select>
+                </div>
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+        Choose Status
+        <select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+            <option >select</option>
+            <option value="dv?key=10&status_name=1&category=1">Open</option>
+            <option value="dv?key=10&status_name=2&category=1">Assigned</option>
+            <option value="dv?key=10&status_name=3&category=1">In Progress</option>
+            <option value="dv?key=10&status_name=4&category=1">Completed</option>
+        </select>
+                </div>
+                </div>
+        <form action="dv" method="get">
+            <br>
+            To search by email,enter here <input type="text" class="form-control" name="mail_id"><input type="submit" class="btn btn-info" name="mail_id1">
+        </form><br>
+        <form action="dv" method="get">
+            To go to the issues directed towards you
+            <input type="submit" class="btn btn-info" name="back" value="click here">
+        </form>
+        <h1>All the Internal Issues</h1>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th>Issue ID</th>
+                <th>Name</th>
+                <th>Email Id</th>
+                <th>Category</th>
+                <th>Issue Header</th>
+                <th>Attachment</th>
+                <th>Status</th>
+                <th>Dev Name</th>
+                <th>Designation</th>
+                <th>Created Date</th>
+                <th>Start Date</th>
+                <th>Close Date</th>
+                <th>Edit</th>
+            <tr/>
+            <?php $var=Issue::where('category','1')->orderBy('issue_id','desc')->paginate('7'); ?>
+            <?php foreach ($var as $key => $value) { ?>
+            <tr>
+                <td><?php echo $value->issue_id;?></td>
+                <td><?php echo $value->name;?></td>
+                <td><?php echo $value->email;?></td>
+                <td><?php echo $value->Category->category_name;?></td>
+                <td><?php echo $value->issue_header;?></td>
+                <td><?php echo $value->attachment;?></td>
+                <td><?php echo $value->Status_table->status_name;?></td>
+                <td><?php echo $value->Developers->dev_name;?></td>
+                <td><?php echo $value->Developers->designation;?></td>
+                <td><?php echo $value->created_at;?></td>
+                <td><?php echo $value->start;?></td>
+                <td><?php echo $value->close;?></td>
+                <?php if(Auth::user()->designation == 'SUPER_ADMIN') { ?>
+                <td><a href="assign?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+                <?php } else { ?>
+                <td><a href="assignd?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+                <?php } ?>
+            </tr>
+            <?php } ?>
+        </table>
+        <?php echo $var->appends(['key'=>'5'])->render(); ?>
+        <?php  } else { echo "NOT ALLOWED" ?>
+        <?php return; } ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <?php }elseif($key==6){
+        if(Auth::user()->designation=='SUPER_ADMIN'){?>
+        <div class="row">
+            <div class="alert alert-success"><h3>EXTERNAL ISSUES</h3></div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+        Choose Category
+        <select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+            <option >select</option>
+            <option value="dv?key=4">All</option>
+            <option value="dv?key=5">Internal</option>
+            <option value="dv?key=6">External</option>
+        </select>
+                </div>
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+        Choose Status
+        <select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+            <option >select</option>
+            <option value="dv?key=10&status_name=1&category=2">Open</option>
+            <option value="dv?key=10&status_name=2&category=2">Assigned</option>
+            <option value="dv?key=10&status_name=3&category=2">In Progress</option>
+            <option value="dv?key=10&status_name=4&category=2">Completed</option>
+        </select>
+                    </div>
+                    </div>
+        <form class="form-inline" action="dv" method="get">
+            <br>
+            To search by email, enter here <input type="text" class="form-control" name="mail_id"><input type="submit" class="btn btn-info" name="mail_id1">
+        </form>
+        <br>
+        <form class="form-inline" action="dv" method="get">
+            To go to the issues directed towards you
+            <input type="submit" class="btn btn-info" name="back" value="click here">
+        </form>
+        <h1>All the External Issues</h1>
+        <table class="table table-hover table-bordered" >
+            <tr>
+                <th>Issue ID</th>
+                <th>Name</th>
+                <th>Email Id</th>
+                <th>Category</th>
+                <th>Issue Header</th>
+                <th>Attachment</th>
+                <th>Status</th>
+                <th>Dev Name</th>
+                <th>Designation</th>
+                <th>Created Date</th>
+                <th>Start Date</th>
+                <th>Close Date</th>
+                <th>Edit</th>
+            <tr/>
+            <?php $var=Issue::where('category','2')->orderBy('issue_id','desc')->paginate('7'); ?>
+            <?php foreach ($var as $key => $value) { ?>
+            <tr>
+                <td><?php echo $value->issue_id;?></td>
+                <td><?php echo $value->name;?></td>
+                <td><?php echo $value->email;?></td>
+                <td><?php echo $value->Category->category_name;?></td>
+                <td><?php echo $value->issue_header;?></td>
+                <td><?php echo $value->attachment;?></td>
+                <td><?php echo $value->Status_table->status_name;?></td>
+                <td><?php echo $value->Developers->dev_name;?></td>
+                <td><?php echo $value->Developers->designation;?></td>
+                <td><?php echo $value->created_at;?></td>
+                <td><?php echo $value->start;?></td>
+                <td><?php echo $value->close;?></td>
+                <?php if(Auth::user()->designation == 'SUPER_ADMIN') { ?>
+                <td><a href="assign?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+                <?php } else { ?>
+                <td><a href="assignd?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+                <?php } ?>
+            </tr>
+            <?php } ?>
+        </table>
+        <?php echo $var->appends(['key'=>'6'])->render(); ?>
+        <?php  } else { echo "NOT ALLOWED" ?>
+        <?php return; } ?>
+        <?php } ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <?php if($key==10){
+        if(Auth::user()->designation=='SUPER_ADMIN'){
+        $status_name=Input::get('status_name');
+        $category=Input::get('category');
+        ?>
+        <?php    if($category=='0'){ ?>
+        <div class="alert alert-info">
+            <h2>ALL STATUS <?php $var11=Status_table::where('id',$status_name)->first(); echo $var11->status_name; ?></h2>
+        </div>
+        <?php $var=Issue::where('status',$status_name)->orderBy('issue_id','desc')->first(); ?>
+        Choose Status
+        <select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+            <option >select</option>
+            <option value="dv?key=10&status_name=1&category=0">Open</option>
+            <option value="dv?key=10&status_name=2&category=0">Assigned</option>
+            <option value="dv?key=10&status_name=3&category=0">In Progress</option>
+            <option value="dv?key=10&status_name=4&category=0">Completed</option>
+        </select>
+        <form class="form-inline" action="dv" method="get">
+            <br>
+            To search by email, enter here <input type="text" class="form-control" name="mail_id"><input type="submit" class="btn btn-info" name="mail_id1">
+        </form>
+        <br>
+        <form class="form-inline" action="dv">
+            <br> To go to back<input type="submit" class="btn btn-info" name="back1" value="click here">
+        </form>
+        <br>
+        <?php    if(!$var){  ?>
+        <div class="alert alert-danger">
+            <h2>
+                There are no issues
+            </h2>
+        </div>
+        <?php } else{
+        $var=Issue::where('status',$status_name)->orderBy('issue_id','desc')->get();  ?>
+        <div class="alert alert-info">
+            <h2>STATUS <?php $var11=Status_table::where('id',$status_name)->first(); echo $var11->status_name; ?></h2>
+        </div>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th>Issue ID</th>
+                <th>Name</th>
+                <th>Email Id</th>
+                <th>Category</th>
+                <th>Issue Header</th>
+                <th>Attachment</th>
+                <th>Status</th>
+                <th>Dev Name</th>
+                <th>Designation</th>
+                <th>Created Date</th>
+                <th>Start Date</th>
+                <th>Close Date</th>
+                <th>Edit</th>
+            <tr/>
+            <?php foreach ($var as $key => $value) { ?>
+            <tr>
+                <td><?php echo $value->issue_id;?></td>
+                <td><?php echo $value->name;?></td>
+                <td><?php echo $value->email;?></td>
+                <td><?php echo $value->Category->category_name;?></td>
+                <td><?php echo $value->issue_header;?></td>
+                <td><?php echo $value->attachment;?></td>
+                <td><?php echo $value->Status_table->status_name;?></td>
+                <td><?php echo $value->Developers->dev_name;?></td>
+                <td><?php echo $value->Developers->designation;?></td>
+                <td><?php echo $value->created_at;?></td>
+                <td><?php echo $value->start;?></td>
+                <td><?php echo $value->close;?></td>
+                <?php if(Auth::user()->designation == 'SUPER_ADMIN') { ?>
+                <td><a href="assign?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+                <?php } else { ?>
+                <td>
+                    <a href="assignd?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+                <?php } ?>
+            </tr>
+            <?php } ?>
+        </table>
+        <?php } ?>
+        <?php } ?>
+        <?php    if($category=='1'){ ?>
+        <div class="alert alert-info">
+            <h2>INTERNAL STATUS <?php $var11=Status_table::where('id',$status_name)->first(); echo $var11->status_name; ?></h2>
+        </div>
+        <?php $var=Issue::where('status',$status_name)->where('category',$category)->orderBy('issue_id','desc')->first(); ?>
+        Choose Status
+        <select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+            <option >select</option>
+            <option value="dv?key=10&status_name=1&category=1">Open</option>
+            <option value="dv?key=10&status_name=2&category=1">Assigned</option>
+            <option value="dv?key=10&status_name=3&category=1">In Progress</option>
+            <option value="dv?key=10&status_name=4&category=1">Completed</option>
+        </select>
+        <form class="form-inline" action="dv" method="get">
+            <br>
+            To search by email, enter here <input type="text" class="form-control" name="mail_id"><input type="submit" class="btn btn-info" name="mail_id1">
+        </form>
+        <br>
+        <form class="form-inline" action="dv">
+            <br> To go to back
+            <input type="submit" class="btn btn-info" name="back1" value="click here">
+        </form>
+        <?php    if(!$var){  ?>
+        <div class="alert alert-danger">
+            <h2>There are no issues
+            </h2>
+        </div>
+        <?php }    else {
+        $var=Issue::where('status',$status_name)->where('category',$category)->orderBy('issue_id','desc')->get();  ?>
+        <br>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th>Issue ID</th>
+                <th>Name</th>
+                <th>Email Id</th>
+                <th>Category</th>
+                <th>Issue Header</th>
+                <th>Attachment</th>
+                <th>Status</th>
+                <th>Dev Name</th>
+                <th>Designation</th>
+                <th>Created Date</th>
+                <th>Start Date</th>
+                <th>Close Date</th>
+                <th>Edit</th>
+            <tr/>
+            <?php foreach ($var as $key => $value) { ?>
+            <tr>
+                <td><?php echo $value->issue_id;?></td>
+                <td><?php echo $value->name;?></td>
+                <td><?php echo $value->email;?></td>
+                <td><?php echo $value->Category->category_name;?></td>
+                <td><?php echo $value->issue_header;?></td>
+                <td><?php echo $value->attachment;?></td>
+                <td><?php echo $value->Status_table->status_name;?></td>
+                <td><?php echo $value->Developers->dev_name;?></td>
+                <td><?php echo $value->Developers->designation;?></td>
+                <td><?php echo $value->created_at;?></td>
+                <td><?php echo $value->start;?></td>
+                <td><?php echo $value->close;?></td>
+                <?php if(Auth::user()->designation == 'SUPER_ADMIN') { ?>
+                <td><a href="assign?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+                <?php } else { ?>
+                <td><a href="assignd?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+                <?php } ?>
+            </tr>
+            <?php } ?>
+
+
+
+</table>
+
+
+    <?php } ?>
+
+
+
+
+
+
+<?php } ?>
+
+
+
+
+
+
+
+<?php    if($category=='2'){ ?>
+    <div class="alert alert-info">
+    <h2>EXTERNAL &nbsp&nbsp&nbsp STATUS <?php $var11=Status_table::where('id',$status_name)->first(); echo $var11->status_name; ?> </h2>
+</div>
+    <?php $var=Issue::where('status',$status_name)->where('category',$category)->orderBy('issue_id','desc')->first(); ?>
+
+    Choose Status
+    <select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+        <option >select</option>
+        <option value="dv?key=10&status_name=1&category=2">Open</option>
+        <option value="dv?key=10&status_name=2&category=2">Assigned</option>
+        <option value="dv?key=10&status_name=3&category=2">In Progress</option>
+        <option value="dv?key=10&status_name=4&category=2">Completed</option>
+    </select>
+        <form class="form-inline" action="dv" method="get">
+            <br>
+            To search by email, enter here <input type="text" class="form-control" name="mail_id"><input type="submit" class="btn btn-info" name="mail_id1">
+        </form>
+        <br>
+            <form class="form-inline" action="dv">
+                <br> To go to back
+                <input type="submit" class="btn btn-info" name="back1" value="click here">
+            </form>
+
+            <?php   if(!$var){ ?>
+
+        <div class="alert alert-danger">
+            <h2>There are no issues</h2>
+        </div>
+              <?php  }
+else{
+    $var=Issue::where('status',$status_name)->where('category',$category)->orderBy('issue_id','desc')->get();  ?>
+
+
+<br>
+<table class="table table-hover table-bordered" >
+    <tr>
+        <th>Issue ID</th>
+        <th>Name</th>
+        <th>Email Id</th>
+        <th>Category</th>
+        <th>Issue Header</th>
+        <th>Attachment</th>
+        <th>Status</th>
+        <th>Dev Name</th>
+        <th>Designation</th>
+        <th>Created Date</th>
+        <th>Start Date</th>
+        <th>Close Date</th>
+        <th>Edit</th>
+
+
+    <tr/>
+
+
+    <?php foreach ($var as $key => $value) { ?>
+    <tr>
+        <td><?php echo $value->issue_id;?></td>
+        <td><?php echo $value->name;?></td>
+        <td><?php echo $value->email;?></td>
+        <td><?php echo $value->Category->category_name;?></td>
+        <td><?php echo $value->issue_header;?></td>
+        <td><?php echo $value->attachment;?></td>
+        <td><?php echo $value->Status_table->status_name;?></td>
+        <td><?php echo $value->Developers->dev_name;?></td>
+        <td><?php echo $value->Developers->designation;?></td>
+        <td><?php echo $value->created_at;?></td>
+        <td><?php echo $value->start;?></td>
+        <td><?php echo $value->close;?></td>
+        <?php if(Auth::user()->designation == 'SUPER_ADMIN') { ?>
+        <td><a href="assign?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+        <?php } else { ?>
+        <td><a href="assignd?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+        <?php } ?>
+    </tr>
+    <?php } ?>
+
+
+
+</table>
+
+
+
+
+    <?php } ?>
+
+
+
+
+<?php } ?>
+<?php }else{ echo 'NOT ALLOWED'; } ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php } else if($key==22){  ?>
+<?php  $var = Issue::where('dev_id',Auth::user()->id)->where('status','2')->get(); ?>
+<?php  $var11 = Issue::where('dev_id',Auth::user()->id)->where('status','2')->first(); ?>
+
+<div class="alert alert-info"><h3>These are the issues that are assigned to you having status Assigned</h3></div>
+        <div class="row">
+            <div class="col-md-4">
+Choose by category
+
+<select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+    <option >select</option>
+    <option value="dv?key=0">All</option>
+    <option value="dv?key=1">Internal</option>
+    <option value="dv?key=2">External</option>
+</select>
+       </div>
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+Choose by status
+<select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+    <option >select</option>
+
+    <option value="dv?key=22">Assigned</option>
+    <option value="dv?key=23">In Progress</option>
+    <option value="dv?key=24">Completed</option>
+
+</select>
+                </div>
+                </div>
+<?php if(!$var11){ ?>
+        <div class="alert alert-danger"><h3>There are no issues</h3> </div>
+        <?php }else{ ?>
+
+<table class="table table-hover table-bordered" >
+    <tr>
+        <th>Issue ID</th>
+        <th>Name</th>
+        <th>Email Id</th>
+        <th>Category</th>
+        <th>Issue Header</th>
+        <th>Attachment</th>
+        <th>Status</th>
+        <th>Dev Name</th>
+        <th>Designation</th>
+        <th>Created Date</th>
+        <th>Start Date</th>
+        <th>Close Date</th>
+        <th>Edit</th>
+
+
+    <tr/>
+
+    <?php foreach ($var as $key => $value) { ?>
+    <tr>
+        <td><?php echo $value->issue_id;?></td>
+        <td><?php echo $value->name;?></td>
+        <td><?php echo $value->email;?></td>
+        <td><?php echo $value->Category->category_name;?></td>
+        <td><?php echo $value->issue_header;?></td>
+        <td><?php echo $value->attachment;?></td>
+        <td><?php echo $value->Status_table->status_name;?></td>
+        <td><?php echo $value->Developers->dev_name;?></td>
+        <td><?php echo $value->Developers->designation;?></td>
+        <td><?php echo $value->created_at;?></td>
+        <td><?php echo $value->start;?></td>
+        <td><?php echo $value->close;?></td>
+        <?php if(Auth::user()->designation == 'SUPER_ADMIN') { ?>
+        <td><a href="assign?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+        <?php } else { ?>
+        <td><a href="assignd?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+        <?php } ?>
+    </tr>
+    <?php } ?>
+    <?php } ?>
+
+
+</table>
+
+<?php if(Auth::user()->designation == 'SUPER_ADMIN'){ ?>
+<h2>
+    To check out the other issues, click <a href="dv?key=4"> <button class="btn btn-info btn-lg"> Here</button></a>
+
+</h2>
+<?php } ?>
+
+
+
+
+
+
+
+
+
+
+<?php } else if($key==23){  ?>
+<?php  $var = Issue::where('dev_id',Auth::user()->id)->where('status','3')->get(); ?>
+<?php  $var11 = Issue::where('dev_id',Auth::user()->id)->where('status','3')->first(); ?>
+
+    <div class="alert alert-info"><h3>These are the issues that are assigned to you having status In Progress</h3></div>
+    <div class="row">
+        <div class="col-md-4">
+        Choose by category
+
+<select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+    <option >select</option>
+    <option value="dv?key=0">All</option>
+    <option value="dv?key=1">Internal</option>
+    <option value="dv?key=2">External</option>
+</select>
+            </div>
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+Choose by status
+<select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+    <option >select</option>
+
+    <option value="dv?key=22">Assigned</option>
+    <option value="dv?key=23">In Progress</option>
+    <option value="dv?key=24">Completed</option>
+
+</select>
+            </div>
+            </div>
+<?php if(!$var11){ ?>
+        <div class="alert alert-danger"><h3>There are no issues</h3></div>
+        <?php }else{ ?>
+        <table class="table table-hover table-bordered" >
+    <tr>
+        <th>Issue ID</th>
+        <th>Name</th>
+        <th>Email Id</th>
+        <th>Category</th>
+        <th>Issue Header</th>
+        <th>Attachment</th>
+        <th>Status</th>
+        <th>Dev Name</th>
+        <th>Designation</th>
+        <th>Created Date</th>
+        <th>Start Date</th>
+        <th>Close Date</th>
+        <th>Edit</th>
+
+
+    <tr/>
+
+    <?php foreach ($var as $key => $value) { ?>
+    <tr>
+        <td><?php echo $value->issue_id;?></td>
+        <td><?php echo $value->name;?></td>
+        <td><?php echo $value->email;?></td>
+        <td><?php echo $value->Category->category_name;?></td>
+        <td><?php echo $value->issue_header;?></td>
+        <td><?php echo $value->attachment;?></td>
+        <td><?php echo $value->Status_table->status_name;?></td>
+        <td><?php echo $value->Developers->dev_name;?></td>
+        <td><?php echo $value->Developers->designation;?></td>
+        <td><?php echo $value->created_at;?></td>
+        <td><?php echo $value->start;?></td>
+        <td><?php echo $value->close;?></td>
+        <?php if(Auth::user()->designation == 'SUPER_ADMIN') { ?>
+        <td><a href="assign?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+        <?php } else { ?>
+        <td><a href="assignd?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+        <?php } ?>
+    </tr>
+    <?php } ?>
+
+
+</table>
+        <?php } ?>
+
+<?php if(Auth::user()->designation == 'SUPER_ADMIN'){ ?>
+<h2>
+    To check out the other issues, click  <a href="dv?key=4"><button class="btn btn-info btn-lg"> Here</button></a>
+
+</h2>
+<?php } ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php } else if($key==24){  ?>
+<?php  $var = Issue::where('dev_id',Auth::user()->id)->where('status','4')->get(); ?>
+<?php  $var11 = Issue::where('dev_id',Auth::user()->id)->where('status','4')->first(); ?>
+
+    <div class="alert alert-info"><h3>These are the issues that are assigned to you having status Completed</h3></div>
+        <div class="row">
+            <div class="col-md-4">
+        Choose by category
+
+<select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+    <option >select</option>
+    <option value="dv?key=0">All</option>
+    <option value="dv?key=1">Internal</option>
+    <option value="dv?key=2">External</option>
+</select>
+                </div>
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+Choose by status
+<select class="form-control" name="choice" onchange="location = this.options[this.selectedIndex].value;">
+    <option >select</option>
+
+    <option value="dv?key=22">Assigned</option>
+    <option value="dv?key=23">In Progress</option>
+    <option value="dv?key=24">Completed</option>
+
+</select>
+                </div>
+                </div>
+        <?php if(!$var11){ ?>
+        <div class="alert alert-danger"><h3>There are no issues</h3></div>
+        <?php }else{ ?>
+        <table class="table table-hover table-bordered" >
+    <tr>
+        <th>Issue ID</th>
+        <th>Name</th>
+        <th>Email Id</th>
+        <th>Category</th>
+        <th>Issue Header</th>
+        <th>Attachment</th>
+        <th>Status</th>
+        <th>Dev Name</th>
+        <th>Designation</th>
+        <th>Created Date</th>
+        <th>Start Date</th>
+        <th>Close Date</th>
+        <th>Edit</th>
+
+
+    <tr/>
+
+    <?php foreach ($var as $key => $value) { ?>
+    <tr>
+        <td><?php echo $value->issue_id;?></td>
+        <td><?php echo $value->name;?></td>
+        <td><?php echo $value->email;?></td>
+        <td><?php echo $value->Category->category_name;?></td>
+        <td><?php echo $value->issue_header;?></td>
+        <td><?php echo $value->attachment;?></td>
+        <td><?php echo $value->Status_table->status_name;?></td>
+        <td><?php echo $value->Developers->dev_name;?></td>
+        <td><?php echo $value->Developers->designation;?></td>
+        <td><?php echo $value->created_at;?></td>
+        <td><?php echo $value->start;?></td>
+        <td><?php echo $value->close;?></td>
+        <?php if(Auth::user()->designation == 'SUPER_ADMIN') { ?>
+        <td><a href="assign?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+        <?php } else { ?>
+        <td><a href="assignd?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">Edit</a></td>
+        <?php } ?>
+    </tr>
+    <?php } ?>
+            <?php } ?>
+
+
+</table>
+
+<?php if(Auth::user()->designation == 'SUPER_ADMIN'){ ?>
+<h2>
+    To check out the other issues, click   <a href="dv?key=4"><button class="btn btn-info btn-lg">Here</button></a>
+
+</h2>
+<?php } ?>
+<?php } ?>
+
+
+
+
+
+
+
+
+</div>
+</body>
+</html>
