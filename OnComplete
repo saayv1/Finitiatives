@@ -1,0 +1,31 @@
+<?php
+
+
+use App\Issue;
+use App\Developers;
+
+?>
+<!DOCTYPE html>
+
+
+
+Dear <span style="color:red"><?php echo $temp->name; ?></span> ,
+<br>
+
+Your issue with the id  <span style="color: #0000C2"> <?php echo $temp->issue_id; ?></span> has been resolved.
+<br>
+Your issue which was assigned to our developer <span style="color: #0000C2"><?php echo $assigned_dev->dev_name; ?></span> has been <span style="color: #880000;"> Resolved.</span>
+<br>
+<?php if($temp->dev_comments){ ?>
+    The developer comments : <br>
+    <?php echo $temp->dev_comments; ?>
+<?php  } ?>
+<br>
+<?php if($temp->dev_attachments){ ?>
+There is a file attached which can help you out with this issue.<br>
+The filename is <?php echo $temp->dev_attachments ?>
+<?php } ?>
+Closed on
+<?php echo $temp->updated_at; ?>
+
+
