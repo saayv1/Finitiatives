@@ -1,0 +1,14 @@
+<?php
+
+
+use App\Issue;
+use App\Developers;
+
+?>
+
+Dear <span style="color:red"><?php echo $temp->name; ?></span> ,
+<br>
+Your issue with the description <br><br>"<?php echo $temp->issue_description; ?> "<br><br> is given an id
+<span style="color: #0000C2">  <?php echo $temp->issue_id; ?></span>. This can be used as your tracking id.
+<br>
+Your issue is assigned to our developer <span style="color: #0000C2"><?php echo $assigned_dev->dev_name; ?>.
