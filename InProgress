@@ -1,0 +1,20 @@
+<?php
+
+
+use App\Issue;
+use App\Developers;
+
+?>
+
+Dear <span style="color:red"><?php echo $temp->name; ?></span> ,
+<br>
+
+Your issue with the id <span style="color: #0000C2"> <?php echo $temp->issue_id; ?> </span>is in progress.
+<br>
+Your issue is assigned to our developer <span style="color: #0000C2"><?php echo $assigned_dev->dev_name; ?></span>
+
+<br><br>
+The start date for the developer to work on is <?php echo $temp->start ?><br><br>
+The issue will be closed by/on <?php echo $temp->close ?><br><br>
+
+<br><br><br>With best regards, TEAM FLIP<br>
