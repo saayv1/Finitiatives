@@ -1,0 +1,298 @@
+<?php namespace App\Http\Controllers;
+        use App\Issue;
+        use App\Developers;
+        use App\Status_table;
+        use App\Category;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Redirect;
+use Auth;
+use Hash;
+use Session;
+
+
+
+
+
+
+
+
+
+
+
+//FOR SUPER ADMIN ONLY//
+//ASSIGNS ISSUES TO DEVELOPERS//
+
+
+
+
+
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="shortcut icon" href="{{ asset('flip-logo.png') }}">
+
+@if ($errors->has())
+        <div class="alert alert-danger">
+            @foreach ($errors->all() as $error)
+                {{ $error }}
+            @endforeach
+        </div>
+    @endif
+    <?php $message=Session::get('message'); ?>
+    <?php if($message){ ?>
+
+    <div class="alert alert-success">
+        <?php echo $message; ?>
+    </div>
+    <?php } ?>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Alfa+Slab+One">
+    <script type="text/javascript" src="js/nicEdit.js"></script> <script type="text/javascript">
+        //<![CDATA[
+        bkLib.onDomLoaded(function() { nicEditors.allTextAreas() });
+        //]]>
+    </script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <title>
+        Issue Details Super Admin
+    </title>
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="http://www.learnwithflip.com/assets//front/images/logo.png" border="0" alt="Finitiatives Learning India Pvt.Ltd" title="Finitiatives Learning India Pvt.Ltd">
+                </div>
+                <div class="col-md-4 h1 text-center" style="font-family:Alfa Slab One ">
+                    Issue Details
+                </div>
+                <div class="col-md-4 text-right">
+                    <form class="form-inline" method="get" action="logout">
+                        <button type="submit" class="btn btn-info btn-lg" name="logout" value="logout"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php $issue_id=$_GET['issue_id']; ?>
+    <?php $dev_id=$_GET['dev_id']; ?>
+    <?php $object = Issue::where('issue_id',$issue_id)->first(); ?>
+
+
+
+</head>
+
+<body>
+<div class="container">
+
+<script type="text/javascript" >
+    function disabler(sel){
+        var a= sel.value;
+        document.getElementById("devs").options[0].disabled = true;
+        document.getElementById("devs").options[1].disabled = true;
+        document.getElementById("dev_comments").disabled = true;
+        document.getElementById("dev_attachment").disabled = true;
+        document.getElementById("status_name").options[0].disabled = true;
+
+        if(a==1) {
+            document.getElementById("devs").disabled = true;
+            document.getElementById("curr_date").disabled = true;
+            document.getElementById("start").disabled = true;
+            document.getElementById("close").disabled = true;
+        }
+        if(a==2){
+            document.getElementById("devs").disabled = false;
+            document.getElementById("curr_date").disabled = true;
+            document.getElementById("start").disabled = true;
+            document.getElementById("close").disabled = false;
+
+        }
+        if(a==3){
+            document.getElementById("devs").disabled = true;
+            document.getElementById("start").disabled = false;
+            document.getElementById("close").disabled = false;
+            document.getElementById("curr_date").disabled = false;
+
+        }
+        if(a==4){
+            document.getElementById("devs").disabled = true;
+            document.getElementById("curr_date").disabled = true;
+            document.getElementById("start").disabled = true;
+            document.getElementById("close").disabled = true;
+            document.getElementById("dev_comments").disabled = false;
+            document.getElementById("dev_attachment").disabled = false;
+        }
+    }
+</script>
+
+
+
+
+    <form class="form" method="post" action="/assign" novalidate enctype="multipart/form-data">
+
+    <table class="table table-bordered h4">
+        <tr>
+            <th style="padding-right: 100px">
+                Name:
+            </th>
+            <td>
+                <?php echo $object->name;?>
+            </td>
+
+        </tr>
+        <tr>
+            <th>
+                Category:
+            </th>
+
+            <td>
+                <?php echo $object->Category->category_name;?>
+            </td>
+
+        </tr>
+        <tr>
+            <th>
+                Attachment:
+            </th>
+            <td>
+                <?php
+                if($object->attachment){ ?>
+
+                    <a href="\Uploads\<?php echo $object->attachment ?>"> <?php echo $object->attachment; ?> </a>
+                    <?php
+                }
+                else
+                {
+                    echo "No files attached";
+                }
+                ?>
+            </td>
+
+        </tr>
+        <tr>
+            <th>
+                Issue Header:
+            </th>
+            <td>
+                <?php echo $object->issue_header;?>
+            </td>
+        </tr>
+
+        <tr>
+            <th>
+                Issue Description:
+            </th>
+            <td>
+                <?php echo $object->issue_description;?>
+            </td>
+
+
+        </tr>
+        </table>
+        <table class="table table h4">
+        <tr>
+            <th>
+                Status Name:
+            </th>
+            <td>
+                <?php echo $object->Status_table->status_name;?>
+            </td>
+
+
+            <input class="form-control" type="hidden" name="issue_id" value="<?php echo $issue_id; ?>">
+            <input class="form-control" type="hidden" name="dev_id" value="<?php echo $dev_id;?>">
+            <input class="form-control" type="hidden" name="current_time" value="<?php date_default_timezone_set("Asia/Kolkata"); echo date("Y-m-d H:i:s"); ?>">
+            <input class="form-control" type="hidden" name="_token" value="{{ csrf_token() }}">
+            <td>
+                <select class="form-control" name="status_name" id="status_name" onchange="disabler(this)" >
+                    <option >Select</option>
+                    <option class="form-control" value="1">Open</option>
+                    <option class="form-control" value="2">Assigned</option>
+                    <option class="form-control" value="3">In Progress</option>
+                    <option class="form-control" value="4">Completed</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Developer Name:
+                </th>
+            <td>
+                <?php echo $object->Developers->dev_name;?>
+            </td>
+            <td>
+                <?php  $dev_team=Developers::all();?>
+                    <select class="form-control" name="devs" id="devs"><option>Select</option>";
+                        <?php foreach ($dev_team as $key=>$value) {
+                            echo "<option value=$value->id > $value->dev_name</option>";
+                        } ?>
+                    </select>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Created On:
+            </th>
+            <td>
+                <?php echo $object->created_at;?>
+            </td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <th>
+                Start Date:
+            </th>
+            <td>
+                <?php echo $object->start?>
+            </td>
+            <td>
+
+                Set current date<input type="checkbox" id="curr_date" name="curr_date" value="<?php date_default_timezone_set("Asia/Kolkata"); echo date("Y-m-d H:i:s"); ?>"/>
+            </td>
+            <td>
+                Choose start date<input class="form-control" type="datetime-local" id="start" name="start" />
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Close Date:
+            </th>
+            <td>
+                <?php echo $object->close;?>
+            </td>
+            <td>
+                <input class="form-control" type="datetime-local" id="close" name="close" />
+            </td>
+        </tr>
+        </table>
+        <table class="table h4">
+            <tr>
+                <th>
+                    Developer Comments:
+                </th>
+                <td class="h1">
+                    <textarea name="dev_comments" id="dev_comments"  rows="3" cols="40"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <th>Developer Attachment</th>
+                <td>
+                    <input class="form-control" type="file" name="dev_attachment" id="dev_attachment" >
+                </td>
+            </tr>
+    </table>
+        <ul class="pager">
+            <li> <input class="btn btn-info" type="submit" name="submit" value="submit"> </li>
+            <li class="previous"><input class="btn btn-info" type="submit" name="back1" value="back"> </li>
+        </ul>
+    </form>
+</div>
+</body>
+</html>
