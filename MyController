@@ -1,0 +1,94 @@
+<?php namespace App\Http\Controllers;
+
+
+
+
+
+
+
+
+
+//My Controller is a controller for dealing with the entry of the USER ISSUE
+
+
+
+
+
+
+
+
+use App\Issue;
+use App\Status_table;
+use App\Developers;
+use App\Category;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Redirect;
+
+
+
+class MyController extends Controller
+{
+
+
+    public function index()
+    {
+        //this is the view the user gets before he can enter the issue//
+        $alls = new Issue;//object of issue model//
+        $alls = $alls->Retrieve();//gets all data from the database//
+
+        return View('MyView', ['als' => $alls]);//sends the object to  Myview//
+
+
+    }
+
+    public function UserValidate(){                                                 ///Data validation//
+
+        $rules = array(                                                             //Routing rules//
+            'name'             => 'required',                                       //Name is a required field//
+            'email'            => 'required|email',                                 //Email is required in the email format//
+            'Category'         => 'required|in:1,2',                                //Category is required//
+            'attachment'       => 'mimes:jpeg,bmp,png,jpg,pdf,zip,html,txt,pptx,ppt,xlsx,xls,doc,docx',                         //attachment//
+            'issue_header'     => 'required|between:2,60',                          //issue header is required//
+
+
+        );
+        $validator = Validator::make(Input::all(), $rules);                         //The input from the form submission is compared with the rules//
+        if ($validator->fails()) {
+            $messages = $validator->messages();
+
+            return Redirect::to('uv')
+                ->withErrors($validator)->withInput();                                           //In case of any failure, the page redirects to the same entry page with data reset//
+        }
+        else{
+
+            $iss = new \App\Issue();                                     //object of the issue model//
+            $iss->name    = ucfirst(Input::get('name'));                         //get name from the form//
+            $iss->email   = Input::get('email');                        //get email id from the form//
+            $iss->issue_description = Input::get('issue_description');  //get the issue description from the form//
+            $iss->issue_header = Input::get('issue_header');            //get the issue header from the form//
+            $iss->category = Input::get('Category');                    //get the category from the form//
+
+            if (Input::hasFile('attachment')) {
+                $real_filename= Input::file('attachment')->getClientOriginalName();
+                $temporary_filename=Input::file('attachment');
+                 $temporary_filename= substr($temporary_filename,12,6);
+                $destination_name=$temporary_filename.$real_filename;
+                $iss->attachment=$destination_name;
+
+            $destinationPath='Uploads/';
+            Input::file('attachment')->move($destinationPath,$destination_name);
+            }
+
+            $iss->save();                                              //Enter into the database//
+            return Redirect::to('IssueList');                          //On success//
+        }
+    }
+
+   public function UserGet()                                                  //Page to get User Entry//
+   {
+       return view('UserEntry2');                                            //returns the User Entry page called 'UserEntry2'//
+
+   }
+}
