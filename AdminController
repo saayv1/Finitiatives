@@ -1,0 +1,327 @@
+<?php namespace App\Http\Controllers;
+
+use App\Issue;
+use App\Status_table;
+use App\Developers;
+use App\Category;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Redirect;
+use Auth;
+use Hash;
+use Mail;
+
+
+
+class AdminController extends Controller{
+
+
+	public function AdminLogin()                                               //This redirects you to the login page for the admin/dev//
+	{
+		return view('AdminLoginView');            
+	}
+
+
+    public function AdminValidate()                                             //When the developer/admin logs in, this method does all the validation//
+    {
+
+        $rules = array(                                                         //The new admin must have an email id and a password//
+
+            'dev_email'  => 'required|email',
+            'password' => 'required',
+        );
+
+        $validator = Validator::make(Input::all(), $rules);                     //Validator function, takes the input, verifies it as per the rules//
+        if($validator->fails()){
+        $messages = $validator->messages();
+            return Redirect::to('al')                                           //On failure, redirection is done, to the login page//
+                ->withErrors($validator);
+        }
+        else{
+
+            $dev_email= Input::get('dev_email');                                //Storing email and password//
+            $pw = Input::get('password');
+
+
+
+            if (Auth::attempt(array('dev_email' => $dev_email,'password' => $pw))) {
+                $id= Developers::where('dev_email',$dev_email)->first();                            //The developer who logged in//
+                $temp=$id;
+                $id= $id->id;
+
+                if(($temp->designation)=='SUPER_ADMIN'){
+                    return Redirect::to('dv?key=4');                                            //If it's a superadmin, it redirects to the page containing all the issues//
+                }else {
+
+                    $dev_issues = Issue::where('dev_id', $id)->get();                        //that dev's issues//
+                    $dev_detail = Developers::where('id', $id)->first();                    //that dev's details//
+
+                    return Redirect::to('dv?key=0');                                        //If it's a developer, it redirects to the page where there are only issues assigned to the dev//
+                }
+            }
+            return Redirect::to('al')->withErrors('Email/Password incorrect');                                                     //Redirection to the login page if authorization fails//
+
+
+        }
+
+    }
+
+
+    public function AdminCreate()                                                   //When a new admin/dev is to be created, this function returns the page where details can be filled//
+    {
+        return view('AdminCreateView');
+
+    }
+
+    public function AdminCreateValidate()                                           //The details entered when a new dev/admin is created are validated here//
+    {
+
+        $rules = array(                                                             //the rules//
+            'name' => 'required',
+            'dev_email' => 'required|email|unique:Developers',                      //must have a name,email,password and designation//
+            'password' => 'required',
+            'password_confirm' => 'required|same:password',
+            'designation' => 'required|in:SUPER_ADMIN,DEVELOPER',
+        );
+
+        $validator = Validator::make(Input::all(), $rules);
+        if ($validator->fails()) {
+            $messages = $validator->messages();
+
+            return Redirect::to('ac')
+                ->withErrors($validator);                       //In case of any failure, the page redirects to the same entry page with data reset//
+        } else {
+
+            $dev = new \App\Developers;
+            $dev->dev_name = Input::get('name');                
+            $dev->designation = "SUPER_ADMIN";
+            $dev->dev_email = Input::get('dev_email');
+            $dev->password = Hash::make(Input::get('password'));
+            $dev->designation = Input::get('designation');
+
+            $dev->save();
+
+            return Redirect::to('ac')->withMessage('Success');          //On success, redirection is done to the same entry page with a success message//
+        }
+    }
+
+    
+
+    public function Assign()
+    {
+        return view ('Assign');                            //This redirects you to a view which is basically the details of the particular issue selected by he admin/dev and it can be assigned to someone/updated on it's progress//
+    }
+
+
+    public function AssignValidate()         //The updated issue details are validated here//
+    {
+
+        $issue_id= Input::get('issue_id');      //issue_id//
+        $dev_id=Input::get('dev_id');                                       //the developer who logged in//
+        $status_name = Input::get('status_name'); //new status name//
+        $temp = Issue::where('issue_id', $issue_id)->first();  //The complete issue details before updation//
+        $start= Input::get('start');        //new start date//
+        $close=Input::get('close');         //new close date//
+        $back=Input::get('back');           //redirection to the page containing the issues directed to the dev/admin//
+        $back1=Input::get('back1');         //redirection to the page containing all the issues// 
+        $curr_date=Input::get('curr_date'); //If the start date of the issue is NOW, this field contains the current date and time//
+        $dev_comments=Input::get('dev_comments');  //Comments by the developer//
+        $current_time=Input::get('current_time');  //The current date and time, only for closing the issue//
+
+
+        if($back){return Redirect::to('dv?key=0');} //redirection to the page containing the issues directed to the dev/admin//
+        if($back1){return Redirect::to('dv?key=4');} //redirection to the page containing all the issues//
+
+        $dev_to_be_assigned=Input::get('devs');     //Get the developer to be assigned//
+        if($status_name=='Select'){                 //Redirect back if no status is selected//
+            return Redirect::back()->withErrors('No status selected');
+        }
+        if($status_name=='1'){                                           //status is open//
+            $temp->status='1';
+            $temp->dev_id='1';                                            //developer unassigned//
+            $temp->start=NULL;                                            //No start and close date//
+            $temp->close=NULL;
+            $temp->dev_comments=NULL;                                     //No comments//
+            $temp->save();
+
+            return Redirect::back()->withMessage('Success on Open');
+        }
+
+        if($status_name=='2')                                               //status is Assigned//
+        {
+            $temp->start=NULL;                                              //NO start and close date//
+            $temp->close=NULL;
+            $temp->status='2';                                              
+            if($dev_to_be_assigned==0){                                     
+                return Redirect::back()->withErrors(['Undefined Developer']);       //The developer to be assigned cannot be Undefined//
+            }
+            else {
+                $temp->dev_id = $dev_to_be_assigned;
+            }
+            if($close) {
+                $temp->close = $close;
+            }
+            Mail::send('OnAssign',['temp'=>$temp,'assigned_dev'=>Developers::where('id',$temp->dev_id)->first()],function($m) use ($temp)
+            {
+                $m->to($temp->email)->subject('Issue Assigned:FLIP');       //send email to the client after assignment of issue//
+           });
+            Mail::send('OnAssignDev',['temp'=>$temp,'assigned_dev'=>Developers::where('id',$temp->dev_id)->first()],function($m) use ($temp)
+            {
+                $m->to($temp->Developers->dev_email)->subject('Issue Assigned:FLIP'); //send email to the developer after assignment//
+            });
+            $temp->save();
+            return Redirect::back()->withMessage('Success on Assignment');
+        }
+
+
+        if($status_name=='3'){                                                      //status is In Progress//
+            if($temp->dev_id=='1')
+            {
+                return Redirect::back()->withErrors('A developer must be assigned');    //an issue cannot be in progress if there is no assignment done prior//
+            }
+            if($temp->dev_id!=$dev_id){
+                return Redirect::back()->withErrors('Only the assigned developer can take up the case');
+            }
+            if($curr_date){
+                $temp->start = $curr_date;
+            }
+            else if($start){
+                $temp->start= $start;
+            }
+            else{
+                return Redirect::back()->withErrors('Start date must be filled');
+            }
+
+            if($close){
+                if($close<=$curr_date || $close<=$start){
+                    return Redirect::back()->withErrors('close date cannot be before start date');
+                }
+                $temp->close = $close;
+            }
+            else{
+                if($temp->close){
+                    $temp->close=$temp->close;
+                }
+
+                else {
+                    return Redirect::back()->withErrors('Close date must be filled');
+                }
+            }
+            $temp->status=$status_name;
+            Mail::send('InProgress',['temp'=>$temp,'assigned_dev'=>Developers::where('id',$temp->dev_id)->first()],function($m) use ($temp)
+            {
+                $m->to($temp->email)->subject('Issue In Progress:FLIP');
+            });
+            $temp->save();
+            return Redirect::back()->withMessage('Success In Progress');
+
+        }
+
+        if($status_name=='4'){                                                              //status is Complete//
+            $temp->status=$status_name;
+            if($dev_comments) {
+                $temp->dev_comments = $dev_comments;
+                $temp->close= $current_time;
+            }
+            if(Input::hasFile('dev_attachment')) {
+                $real_filename= Input::file('dev_attachment')->getClientOriginalName();
+                $temporary_filename=Input::file('dev_attachment');
+                $temporary_filename= substr($temporary_filename,12,6);
+                $destination_name=$temporary_filename.$real_filename;
+
+                $temp->dev_attachment=$destination_name;
+                $destinationPath='UploadsDev/';
+                Input::file('dev_attachment')->move($destinationPath,$destination_name);
+            }
+
+            Mail::send('OnComplete',['temp'=>$temp,'assigned_dev'=>Developers::where('id',$temp->dev_id)->first()],function($m) use ($temp)
+            {
+                $m->to($temp->email)->subject('Issue Resolved:FLIP');
+            });
+            $temp->save();
+            return Redirect::back()->withMessage('Success on Complete');
+        }
+
+
+
+    }
+
+
+
+
+
+
+    public function Assignd()
+    {
+        return view ('Assignd');
+    }
+
+
+
+
+
+
+
+
+
+
+
+    public function logout()
+    {
+        return Redirect::to('al');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function DevView(){
+
+
+        $back=Input::get('back');
+        $back1=Input::get('back1');
+        $mail_id1=Input::get('mail_id1');
+        if($mail_id1){
+            $mail_id=Input::get('mail_id');
+            $dummy=Issue::where('email',$mail_id)->first();
+
+            if($mail_id) {
+                if ($dummy) {
+                    return view('DevViewOnEmail', ['mail_id' => $mail_id]);
+                }
+                else{
+                    return Redirect::back()->withErrors('The id you entered does not exist');
+                }
+            }
+        else return Redirect::back()->withErrors('no email id was entered');
+        }
+
+
+
+
+        elseif($back){
+            return Redirect::to('dv?key=0');
+        }
+
+        elseif($back1){
+            return Redirect::to('dv?key=4');
+        }
+
+        return view('DevView');
+    }
+
+}
