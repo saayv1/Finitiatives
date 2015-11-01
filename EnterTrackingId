@@ -1,0 +1,88 @@
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+
+    <link rel="shortcut icon" href="{{ asset('flip-logo.png') }}">
+
+    <title>
+        User Tracking Page
+    </title>
+    @if ($errors->has())
+        <div class="alert alert-danger">
+            @foreach ($errors->all() as $error)
+                {{ $error }}<br>
+            @endforeach
+        </div>
+    @endif
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="http://www.learnwithflip.com/assets//front/images/logo.png" border="0" alt="Finitiatives Learning India Pvt.Ltd" title="Finitiatives Learning India Pvt.Ltd">
+                </div>
+                <div class="col-md-4 text-center">
+                    <h1 style="font-family: Alfa Slab One">  Issue tracking </h1>
+                </div>
+                <div class="col-md-4 text-right">
+                    <form action="IssueList" method="get">
+                        <button class="btn btn-info btn-lg" type="submit"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true">Back</span></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Alfa+Slab+One">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+
+        <div class="row">
+
+            <div class="col-md-4"></div>
+
+            <div class="col-md-4 h4 ">
+
+                <span class="glyphicon glyphicon-star" style="color:#000099 " aria-hidden="true"></span> Please enter the tracking id associated with your issue
+
+            </div>
+
+        </div>
+
+
+        <div class="row">
+
+            <div class="col-md-4 text-center"></div>
+            <div class="col-md-4 text-center">
+
+
+                <form action="tv">
+
+                    <input class="form-control" type="text" name="issue_id" id="issue_id">
+                    <br>
+                    <button class="btn btn-info" type="submit" name="submit" >Submit  <span class="glyphicon glyphicon-chevron-right" style="color:#FAF834" aria-hidden="true"></span></button>
+
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+
+</div>
+</body>
+</html>
+
