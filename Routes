@@ -1,0 +1,75 @@
+<?php
+/*
+|--------------------------------------------------------------------------
+| Application Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register all of the routes for an application.
+| It's a breeze. Simply tell Laravel the URIs it should respond to
+| and give it the controller to call when that URI is requested.
+|
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+Route::get('/', function () {
+    return view('view_vyaas');
+});
+
+Route::get('issue', 'First_Controller@GetIssues');   //IssueList using SQL queries (not used)(harmless)//
+
+Route::get('issue1', 'Issue_Controller@get_index');  //Simple Page (not used)(harmless)//
+
+
+Route::get('simple', function(){                     //Simple route(not used)(harmless)//
+	return "Hello World!";
+});
+
+
+Route::resource('IssueList','MyController'); //Gets The List Of Issues visible to the user//
+
+Route::post('uv','MyController@UserValidate'); //Validates the User Issue Entry//
+Route::get('uv','MyController@UserGet');       //for Getting User Issue//
+
+
+Route::get('al','AdminController@AdminLogin');     //The Admin Login Page//
+Route::post('al','AdminController@AdminValidate');  //While logging in the admin's password gets validated here//
+
+
+Route::get('ac','AdminController@AdminCreate');   //Creating a new admin//
+Route::post('ac',"AdminController@AdminCreateValidate");  //Validating the data entered by the super admin//
+
+//Route::get('av', ['as'=>'av','uses'=>'AdminController@AdminView']);               //The admin's view of the issues directed towards him/her//
+//Route::get('av1','AdminController@AdminsView1');               //The admin's view of the issues directed towards him/her//
+//Route::get('av2','AdminController@AdminsView2');               //The admin's view of the issues directed towards him/her//
+//Route::get('av3','AdminController@AdminsView3');               //The admin's view of the issues directed towards him/her//
+
+Route::get('assign','AdminController@Assign');                    //Assignment of the issues by the super admin//
+Route::post('assign','AdminController@AssignValidate');           //Updating the issue by the super admin//
+Route::get('assignd','AdminController@Assignd');                    //Updating  the issues by the developer //
+
+Route::get('dv', ['middleware'=>'auth','uses'=>'AdminController@DevView'])->before('auth');
+
+
+Route::get('aoi','AdminController@AdminView1');              //The admin's viewe of all the issues//
+//Route::get('aoi1','AdminController@AdminView2');          //The List of Internal Issues//
+//Route::get('aoi2','AdminController@AdminView3');          //The List of external Issues//
+
+
+
+Route::get('logout','AdminController@logout')->before('auth');                     //logout//
+
+Route::get('te','TrackingController@EnterTrackingId');                          //returns  view for the user to enter his tracking id      TRACKING ENTER//
+Route::get('tv','TrackingController@UserTracking');                             //returns  view for the user to view the status of the issue   TRACKING VIEW//
+
+
