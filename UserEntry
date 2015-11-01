@@ -1,0 +1,135 @@
+<?php
+
+
+
+
+
+                 //THIS IS A FORM FOR ENTERING THE USER ISSUE//
+
+
+
+?>
+
+
+
+<?php
+$name ='';
+$email='';
+$iss_desc='';
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="shortcut icon" href="{{ asset('flip-logo.png') }}">
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="http://www.learnwithflip.com/assets//front/images/logo.png" border="0" alt="Finitiatives Learning India Pvt.Ltd" title="Finitiatives Learning India Pvt.Ltd">
+                </div>
+                <div class="col-md-4 text-center">
+                    <h1 style="font-family:Alfa Slab One">USER ISSUE ENTRY</h1>
+                </div>
+                <div class="col-md-4 text-right">
+                    <form action="IssueList" method="get">
+                        <button class="btn btn-info btn-lg" type="submit"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true">Back</span></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <title>
+        Issue Entry
+    </title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Alfa+Slab+One">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="http://js.nicedit.com/nicEdit-latest.js"></script> <script type="text/javascript">
+        //<![CDATA[
+        bkLib.onDomLoaded(function() { nicEditors.allTextAreas() });
+        //]]>
+    </script>
+
+</head>
+<body>
+@if ($errors->has())
+    <div class="alert alert-danger">
+        @foreach ($errors->all() as $error)
+            {{ $error }}<br>
+        @endforeach
+    </div>
+@endif
+
+
+<div class="container">
+<form  method="post" action="/uv" novalidate enctype="multipart/form-data">
+    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+
+    <div class="row h2">
+        <div class="col-md-4">
+            <label for="name" >Name</label>
+            <input class="form-control" type="text" name="name" id="name" placeholder="Enter your name">
+        </div>
+        <div class="col-md-4">
+            <label for="category">
+                Category:
+            </label>
+            <select class="form-control" name="Category" id="caetgory">
+                <option>Select Category</option>
+                <option value="1">Internal</option>
+                <option value="2">External</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="email">
+                E-mail:
+            </label>
+            <input class="form-control" type="text" name="email" id="email" placeholder="Enter your email id">
+        </div>
+    </div>
+
+
+    <br>
+
+
+    <div class="row h2">
+        <div class="col-md-6">
+            <label for="issue_header">
+                Issue Title/Header:</label><input class="form-control" type="text" name="issue_header" placeholder="a short title for describing the issue">
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row h2">
+        <div class="col-md-6">
+            <label for="issue_description">
+                Issue Description:</label> <textarea name="issue_description" rows="5" cols="40"></textarea>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row h2">
+        <div class="col-md-6">
+    <label for="attachment">
+        <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span> Attachment:</label><input class="form-control" type="file" name="attachment" >
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <input class="btn btn-info btn-lg" type="submit" name="submit" value="submit">
+        </div>
+    </div>
+</form>
+</div>
+
+</body>
+</html>
+
