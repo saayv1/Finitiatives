@@ -1,0 +1,87 @@
+<?php
+
+        use App\Issue;
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="shortcut icon" href="{{ asset('flip-logo.png') }}">
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <title>
+        Issues with respect to email
+    </title>
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="http://www.learnwithflip.com/assets//front/images/logo.png" border="0" alt="Finitiatives Learning India Pvt.Ltd" title="Finitiatives Learning India Pvt.Ltd">
+                </div>
+                <div class="col-md-4 text-center">
+                    <h1>
+                        Issues belonging to <?php echo $mail_id ?>
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</head>
+<body>
+
+<form action="dv">
+    <input type="submit" class="btn btn-info" name="back1" value="Back">
+</form>
+<br>
+<br>
+<br>
+<table class="table table-bordered table-hover">
+    <tr>
+        <th>Issue ID</th>
+        <th>Name</th>
+        <th>Email Id</th>
+        <th>Category</th>
+        <th>Issue Header</th>
+        <th>Attachment</th>
+        <th>Status</th>
+        <th>Dev Name</th>
+        <th>Designation</th>
+        <th>Created Date</th>
+        <th>Start Date</th>
+        <th>Close Date</th>
+        <th>Edit</th>
+
+
+    <tr/>
+    <?php $var=Issue::where('email',$mail_id)->get(); ?>
+
+    <?php foreach ($var as $key => $value) { ?>
+    <tr>
+        <td><?php echo $value->issue_id;?></td>
+        <td><?php echo $value->name;?></td>
+        <td><?php echo $value->email;?></td>
+        <td><?php echo $value->Category->category_name;?></td>
+        <td><?php echo $value->issue_header;?></td>
+        <td><?php echo $value->attachment;?></td>
+        <td><?php echo $value->Status_table->status_name;?></td>
+        <td><?php echo $value->Developers->dev_name;?></td>
+        <td><?php echo $value->Developers->designation;?></td>
+        <td><?php echo $value->created_at;?></td>
+        <td><?php echo $value->start;?></td>
+        <td><?php echo $value->close;?></td>
+        <?php if(Auth::user()->designation == 'SUPER_ADMIN') { ?>
+        <td><a href="assign?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">EDIT</a></td>
+        <?php } else { ?>
+        <td><a href="assignd?issue_id=<?php echo $value->issue_id; ?>&dev_id=<?php echo Auth::user()->id;?>">EDIT</a></td>
+        <?php } ?>
+    </tr>
+</table>
+    <?php } ?>
+
+
+</body>
+</html>
